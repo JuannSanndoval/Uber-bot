@@ -55,7 +55,6 @@ async def recibir_destino(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 headers={"Authorization": ORS_KEY},
                 params={"text": destino + ", Colombia", "size": 1, "boundary.country": "CO"}
             )
-            )
 
             logger.info(f"Respuesta origen: {r_origen.text}")
             logger.info(f"Respuesta destino: {r_destino.text}")
@@ -144,6 +143,10 @@ if __name__ == "__main__":
             ESPERANDO_DESTINO: [MessageHandler(filters.TEXT & ~filters.COMMAND, recibir_destino)],
             ESPERANDO_TARIFA: [MessageHandler(filters.TEXT & ~filters.COMMAND, recibir_tarifa)],
         },
+        fallbacks=[CommandHandler("cancelar", cancelar)],
+    )
+    app.add_handler(conv)
+    app.run_polling()
         fallbacks=[CommandHandler("cancelar", cancelar)],
     )
     app.add_handler(conv)
