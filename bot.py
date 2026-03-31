@@ -53,11 +53,11 @@ async def recibir_destino(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             r_origen = await client.get(
                 "https://api.openrouteservice.org/geocode/search",
-                params={"api_key": ORS_KEY, "text": origen, "size": 1}
+                params={"api_key": ORS_KEY, "text": origen + ", Colombia", "size": 1, "boundary.country": "CO"}
             )
             r_destino = await client.get(
                 "https://api.openrouteservice.org/geocode/search",
-                params={"api_key": ORS_KEY, "text": destino, "size": 1}
+                params={"api_key": ORS_KEY, "text": destino + ", Colombia", "size": 1, "boundary.country": "CO"}
             )
 
             coords_origen = r_origen.json()["features"][0]["geometry"]["coordinates"]
