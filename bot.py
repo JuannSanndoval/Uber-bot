@@ -40,12 +40,3 @@ async def calcular(update: Update, context: ContextTypes.DEFAULT_TYPE):
 app = ApplicationBuilder().token(TOKEN).build()
 app.add_handler(MessageHandler(filters.TEXT, calcular))
 app.run_polling()
-```
-
-8. Haz clic en **"Commit changes"**
-
----
-
-Luego necesitamos un archivo más. Haz clic en **"Add file"** → **"Create new file"** de nuevo, nómbralo `requirements.txt` y pega esto:
-```
-python-telegram-bot==20.7
