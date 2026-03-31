@@ -1,7 +1,11 @@
 import os
 import time
-from telegram import Update, ReplyKeyboardMarkup
+import logging
+from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, filters, ContextTypes, ConversationHandler
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 time.sleep(3)
 
@@ -13,38 +17,37 @@ COMISION_UBER = 0.25
 ESPERANDO_KM, ESPERANDO_TARIFA = range(2)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info(f"Usuario {update.effective_user.id} usó /start")
     await update.message.reply_text(
         "👋 *Bienvenido a tu calculadora Uber*\n\n"
-        "Vamos a calcular tu ganancia.\n\n"
         "📍 ¿Cuántos kilómetros tiene el viaje?",
         parse_mode="Markdown"
     )
     return ESPERANDO_KM
 
 async def recibir_km(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info(f"Recibido km: {update.message.text}")
     try:
         km = float(update.message.text.replace(",", "."))
         context.user_data["km"] = km
         await update.message.reply_text(
-            f"✅ *{km} km* registrados.\n\n"
-            "💰 ¿Cuánto vale el viaje en pesos?",
+            f"✅ *{km} km* registrados.\n\n💰 ¿Cuánto vale el viaje en pesos?",
             parse_mode="Markdown"
         )
         return ESPERANDO_TARIFA
     except:
-        await update.message.reply_text("⚠️ Ingresa solo el número. Ejemplo: *12* o *7.5*", parse_mode="Markdown")
+        await update.message.reply_text("⚠️ Ingresa solo el número. Ejemplo: *12*", parse_mode="Markdown")
         return ESPERANDO_KM
 
 async def recibir_tarifa(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info(f"Recibido tarifa: {update.message.text}")
     try:
-        tarifa = float(update.message.text.replace(",", "").replace(".", ""))
+        tarifa = float(update.message.text.replace(".", "").replace(",", ""))
         km = context.user_data["km"]
-
         costo_gasolina = (PRECIO_GALON / 3.785) / KM_POR_GALON * km
         valor_neto = tarifa * (1 - COMISION_UBER)
         ganancia = valor_neto - costo_gasolina
         emoji = "✅" if ganancia > 0 else "❌"
-
         await update.message.reply_text(
             f"{emoji} *Resumen del viaje*\n\n"
             f"📍 Distancia: {km} km\n"
@@ -63,12 +66,12 @@ async def recibir_tarifa(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return ESPERANDO_TARIFA
 
 async def cancelar(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Cálculo cancelado. Escribe /start para empezar de nuevo.")
+    await update.message.reply_text("Cancelado. Escribe /start para empezar.")
     return ConversationHandler.END
 
 if __name__ == "__main__":
+    logger.info(f"Iniciando bot con token: {TOKEN[:10]}...")
     app = ApplicationBuilder().token(TOKEN).build()
-
     conv = ConversationHandler(
         entry_points=[CommandHandler("start", start)],
         states={
@@ -77,6 +80,6 @@ if __name__ == "__main__":
         },
         fallbacks=[CommandHandler("cancelar", cancelar)],
     )
-
     app.add_handler(conv)
+    logger.info("Bot corriendo...")
     app.run_polling()
