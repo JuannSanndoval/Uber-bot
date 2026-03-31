@@ -1,4 +1,6 @@
 import os
+import time
+time.sleep(3)
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, ContextTypes
 
