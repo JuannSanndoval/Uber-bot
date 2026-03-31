@@ -147,7 +147,3 @@ if __name__ == "__main__":
     )
     app.add_handler(conv)
     app.run_polling()
-        fallbacks=[CommandHandler("cancelar", cancelar)],
-    )
-    app.add_handler(conv)
-    app.run_polling()
