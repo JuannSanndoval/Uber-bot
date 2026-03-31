@@ -15,7 +15,6 @@ ORS_KEY = os.environ.get("ORS_KEY")
 KM_POR_GALON = 50
 PRECIO_GALON = 15500
 COMISION_UBER = 0.25
-GANANCIA_MINIMA_KM = 500
 
 ESPERANDO_ORIGEN, ESPERANDO_DESTINO, ESPERANDO_TARIFA = range(3)
 
@@ -46,11 +45,6 @@ async def recibir_destino(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         async with httpx.AsyncClient() as client:
-            def geocode(lugar):
-                url = "https://api.openrouteservice.org/geocode/search"
-                r = client.get(url, params={"api_key": ORS_KEY, "text": lugar, "size": 1})
-                return r
-
             r_origen = await client.get(
                 "https://api.openrouteservice.org/geocode/search",
                 params={"api_key": ORS_KEY, "text": origen + ", Colombia", "size": 1, "boundary.country": "CO"}
@@ -59,6 +53,9 @@ async def recibir_destino(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "https://api.openrouteservice.org/geocode/search",
                 params={"api_key": ORS_KEY, "text": destino + ", Colombia", "size": 1, "boundary.country": "CO"}
             )
+
+            logger.info(f"Respuesta origen: {r_origen.text}")
+            logger.info(f"Respuesta destino: {r_destino.text}")
 
             coords_origen = r_origen.json()["features"][0]["geometry"]["coordinates"]
             coords_destino = r_destino.json()["features"][0]["geometry"]["coordinates"]
