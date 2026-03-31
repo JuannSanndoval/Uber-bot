@@ -31,12 +31,18 @@ async def calcular(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         await update.message.reply_text(respuesta, parse_mode="Markdown")
 
-    except:
+    except Exception:
         await update.message.reply_text(
             "Envíame: *distancia valor*\nEjemplo: `15 18000`",
             parse_mode="Markdown"
         )
 
-app = ApplicationBuilder().token(TOKEN).build()
-app.add_handler(MessageHandler(filters.TEXT, calcular))
-app.run_polling()
+if __name__ == "__main__":
+    app = ApplicationBuilder().token(TOKEN).build()
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, calcular))
+    app.run_polling()
+```
+
+También actualiza el `Procfile` a:
+```
+worker: python bot.py
