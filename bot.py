@@ -12,13 +12,10 @@ async def calcular(update: Update, context: ContextTypes.DEFAULT_TYPE):
         partes = update.message.text.strip().split()
         km = float(partes[0])
         tarifa = float(partes[1])
-
         costo_gasolina = (PRECIO_GALON / 3.785) / KM_POR_GALON * km
         valor_neto = tarifa * (1 - COMISION_UBER)
         ganancia = valor_neto - costo_gasolina
-
         emoji = "✅" if ganancia > 0 else "❌"
-
         respuesta = (
             f"{emoji} *Resumen del viaje*\n\n"
             f"📍 Distancia: {km} km\n"
@@ -30,7 +27,6 @@ async def calcular(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"📊 Rentabilidad: {(ganancia/tarifa*100):.1f}%"
         )
         await update.message.reply_text(respuesta, parse_mode="Markdown")
-
     except Exception:
         await update.message.reply_text(
             "Envíame: *distancia valor*\nEjemplo: `15 18000`",
@@ -41,8 +37,3 @@ if __name__ == "__main__":
     app = ApplicationBuilder().token(TOKEN).build()
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, calcular))
     app.run_polling()
-```
-
-También actualiza el `Procfile` a:
-```
-worker: python bot.py
